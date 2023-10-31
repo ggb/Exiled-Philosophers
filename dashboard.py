@@ -44,7 +44,11 @@ edges = edges.applymap(sanitize_name)
 st.sidebar.header("Network")
 
 net_coloring = st.sidebar.radio("Coloring", 
-                                ["Grade Centrality", "Community"])
+                                ["Degree Centrality", "Community"])
+
+node_size_alg = st.sidebar.radio("Node size",
+                                 ["Uniform", "Degree", "SP Betweenness", "Harmonic"],
+                                 index=2)
 
 # Map and dataframe related inputs
 st.sidebar.header("Map and Raw Data")
@@ -65,14 +69,6 @@ df = df.query(
     "birthDate >= @born_min & birthDate <= @born_max & ((deathDate >= @death_min & deathDate <= @death_max) | missingDeathDate)"
 )
 
-# ----- MAINPAGE -----
-st.title(":classical_building: Exiled Philosophers")
-st.markdown("""
-##
-           
-""")
-
-
 ###
 edges_wo = edges[edges['source'] != edges['target']]
 orphaned_philos = set(edges["source"].unique()) - set(edges_wo["source"].unique())
@@ -83,6 +79,17 @@ partition = cl.best_partition(G)
 # Calculate betweenness centrality
 betweenness_dict = nx.betweenness_centrality(G)
 degrees_dict = nx.degree_centrality(G)
+harmonic_dict = nx.harmonic_centrality(G)
+
+def node_size_calc(node):
+    if node_size_alg == "Degree":
+        return degrees_dict[node]  * 80 + 5
+    elif node_size_alg == "SP Betweenness":
+        return betweenness_dict[node]  * 80 + 5
+    elif node_size_alg == "Harmonic":
+        return (harmonic_dict[node] * 0.7) or 3
+    else:
+        return 5        
 
 def create_born_tooltip(row):
     link = row["id"].replace("http://de.dbpedia.org/resource", "https://de.wikipedia.org/wiki")
@@ -105,7 +112,6 @@ def partition_color(name):
     cmap_cat = cm.get_cmap("tab10") 
     norm = plt.Normalize(min(partition.values()), max(partition.values()))
     if name in partition:
-        print(mcolors.to_hex(cmap_cat(norm(partition[name]))))
         return mcolors.to_hex(cmap_cat(norm(partition[name])))
     else:
         return "black"
@@ -115,45 +121,65 @@ def degree_color(name):
     norm = plt.Normalize(min(degrees_dict.values()), max(degrees_dict.values()))
     return mcolors.to_hex(cmap_con(norm(degrees_dict[name])))
 
+folium_colors = [
+    'red',
+    'blue',
+    'gray',
+    'darkred',
+    'lightred',
+    'orange',
+    'beige',
+    'green',
+    'darkgreen',
+    'lightgreen',
+    'darkblue',
+    'lightblue',
+    'purple',
+    'darkpurple',
+    'pink',
+    'cadetblue',
+    'lightgray',
+    'black'
+]
 def partition_map_color(name):
-    colors = [
-        'red',
-        'blue',
-        'gray',
-        'darkred',
-        'lightred',
-        'orange',
-        'beige',
-        'green',
-        'darkgreen',
-        'lightgreen',
-        'darkblue',
-        'lightblue',
-        'purple',
-        'darkpurple',
-        'pink',
-        'cadetblue',
-        'lightgray',
-        'black'
-    ]
     if name in partition:
-        return colors[partition[name]]
+        return folium_colors[partition[name]]
     else:
         return "black"
 
+def color_marker(row, birth=True):
+    if map_coloring == "Born / Died":
+        return "blue" if birth else "black"
+    elif map_coloring == "Community":
+        return partition_map_color(row["name"])
+    else: 
+        return random.choice(folium_colors)
 
 for i, node in enumerate(G.nodes()):
-    G.nodes[node]['size'] = betweenness_dict[node] * 80 + 5
+    G.nodes[node]['size'] = node_size_calc(node)
     G.nodes[node]['color'] = partition_map_color(node) if net_coloring == "Community" else degree_color(node)
 
+
+# ----- MAINPAGE -----
+st.title(":classical_building: Exiled Philosophers")
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Philosophers", len(df))
+col2.metric("Communities", max(partition.values()) + 1)
+col3.metric("Birth places", len(df["birthPlace"].unique()))
+col4.metric("Death places", len(df["deathPlace"].unique()))
+
+st.markdown("""
+##
+           
+""")
 
 #
 tab1, tab2, tab3 = st.tabs(["Network", "Spatial", "Raw Data"])
 
-
 with tab1:
-    tab1.markdown("""
-    Zoom in, interact with nodes and explore the network of exiled philosophers!
+    tab1.markdown(f"""
+    Zoom in, interact with nodes and explore the network of exiled philosophers! { max(partition.values()) + 1 } communities of philosophers were identified in the network, using the [louvain communities](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html) algorithm.
     """)
     net = Network()
     net.from_nx(G)
@@ -177,13 +203,13 @@ with tab2:
         folium.Marker(
                     coord_jitter(row["birthGis"]),
                     popup=create_born_tooltip(row),
-                    icon=folium.Icon(color=partition_map_color(row["name"]), icon='cake-candles', prefix='fa')
+                    icon=folium.Icon(color=color_marker(row), icon='cake-candles', prefix='fa')
                     ).add_to(m)
         try:
             folium.Marker(
                         coord_jitter(row["deathGis"]),
                         popup=create_death_tooltip(row),
-                        icon=folium.Icon(color=partition_map_color(row["name"]), icon='skull', prefix='fa')
+                        icon=folium.Icon(color=color_marker(row, False), icon='skull', prefix='fa')
                         ).add_to(m)
         except:
             without_death_place.append(row["name"])
@@ -195,4 +221,4 @@ with tab2:
 
 with tab3:
     tab3.dataframe(df)
-    tab3.dataframe(edges_wo)
+    #tab3.dataframe(edges_wo)
