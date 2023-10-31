@@ -1,0 +1,14 @@
+openpyxl 
+numpy
+pandas
+wikipedia
+spacy
+requests
+SPARQLWrapper
+folium
+streamlit
+streamlit-folium
+networkx
+community
+matplotlib
+pyvis
