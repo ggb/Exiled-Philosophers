@@ -8,6 +8,7 @@ SPARQLWrapper
 folium
 streamlit
 streamlit-folium
+python-louvain 
 networkx
 community
 matplotlib
