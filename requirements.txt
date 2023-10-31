@@ -10,6 +10,5 @@ streamlit
 streamlit-folium
 python-louvain 
 networkx
-community
 matplotlib
 pyvis

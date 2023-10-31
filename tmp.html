@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#472f7d", "id": "Bernhard Groethuysen", "label": "Bernhard Groethuysen", "shape": "dot", "size": 5}, {"color": "#54c568", "id": "Martin Buber", "label": "Martin Buber", "shape": "dot", "size": 12}, {"color": "#54c568", "id": "Ernst Bloch", "label": "Ernst Bloch", "shape": "dot", "size": 13}, {"color": "#414487", "id": "Margarete Susman", "label": "Margarete Susman", "shape": "dot", "size": 5}, {"color": "#7ad151", "id": "Hannah Arendt", "label": "Hannah Arendt", "shape": "dot", "size": 10}, {"color": "#39568c", "id": "Ernst Simon", "label": "Ernst Simon", "shape": "dot", "size": 7}, {"color": "#481a6c", "id": "Salomo Friedlaender", "label": "Salomo Friedlaender", "shape": "dot", "size": 5}, {"color": "#1f988b", "id": "Hans Jonas", "label": "Hans Jonas", "shape": "dot", "size": 7}, {"color": "#7ad151", "id": "Leo Strauss", "label": "Leo Strauss", "shape": "dot", "size": 15}, {"color": "#440154", "id": "Abraham Joshua Heschel", "label": "Abraham Joshua Heschel", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Hermann Levin Goldschmidt", "label": "Hermann Levin Goldschmidt", "shape": "dot", "size": 5}, {"color": "#23888e", "id": "Eveline Goodman-Thau", "label": "Eveline Goodman-Thau", "shape": "dot", "size": 9}, {"color": "#481a6c", "id": "Rivka Horwitz", "label": "Rivka Horwitz", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Ze\u2019ev Levy", "label": "Ze\u2019ev Levy", "shape": "dot", "size": 5}, {"color": "#23888e", "id": "Herbert Marcuse", "label": "Herbert Marcuse", "shape": "dot", "size": 7}, {"color": "#a5db36", "id": "Paul Tillich", "label": "Paul Tillich", "shape": "dot", "size": 16}, {"color": "#fde725", "id": "Walter Benjamin", "label": "Walter Benjamin", "shape": "dot", "size": 16}, {"color": "#54c568", "id": "Theodor W. Adorno", "label": "Theodor W. Adorno", "shape": "dot", "size": 8}, {"color": "#39568c", "id": "Karl Korsch", "label": "Karl Korsch", "shape": "dot", "size": 10}, {"color": "#39568c", "id": "Alfred Sohn-Rethel", "label": "Alfred Sohn-Rethel", "shape": "dot", "size": 6}, {"color": "#a5db36", "id": "G\u00fcnther Anders", "label": "G\u00fcnther Anders", "shape": "dot", "size": 11}, {"color": "#472f7d", "id": "Gotthard G\u00fcnther", "label": "Gotthard G\u00fcnther", "shape": "dot", "size": 6}, {"color": "#440154", "id": "Hans B\u00fcchenbacher", "label": "Hans B\u00fcchenbacher", "shape": "dot", "size": 5}, {"color": "#39568c", "id": "Hans Reichenbach", "label": "Hans Reichenbach", "shape": "dot", "size": 17}, {"color": "#481a6c", "id": "Oskar Goldberg", "label": "Oskar Goldberg", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Lotte Labowsky", "label": "Lotte Labowsky", "shape": "dot", "size": 5}, {"color": "#472f7d", "id": "Raymond Klibansky", "label": "Raymond Klibansky", "shape": "dot", "size": 8}, {"color": "#d2e21b", "id": "Ernst Cassirer", "label": "Ernst Cassirer", "shape": "dot", "size": 29}, {"color": "#440154", "id": "Ernst Hoffmann", "label": "Ernst Hoffmann", "shape": "dot", "size": 5}, {"color": "#31688e", "id": "Erich Fromm", "label": "Erich Fromm", "shape": "dot", "size": 5}, {"color": "#22a884", "id": "Max Horkheimer", "label": "Max Horkheimer", "shape": "dot", "size": 8}, {"color": "#39568c", "id": "Norbert Elias", "label": "Norbert Elias", "shape": "dot", "size": 6}, {"color": "#440154", "id": "Otto Neurath", "label": "Otto Neurath", "shape": "dot", "size": 5}, {"color": "#23888e", "id": "Karl Mannheim", "label": "Karl Mannheim", "shape": "dot", "size": 6}, {"color": "#481a6c", "id": "Zvi H. Rosen", "label": "Zvi H. Rosen", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Theodor Lessing", "label": "Theodor Lessing", "shape": "dot", "size": 6}, {"color": "#472f7d", "id": "Heinrich Bl\u00fccher", "label": "Heinrich Bl\u00fccher", "shape": "dot", "size": 5}, {"color": "#31688e", "id": "Richard H\u00f6nigswald", "label": "Richard H\u00f6nigswald", "shape": "dot", "size": 8}, {"color": "#31688e", "id": "William Stern", "label": "William Stern", "shape": "dot", "size": 6}, {"color": "#440154", "id": "Walter Dubislav", "label": "Walter Dubislav", "shape": "dot", "size": 5}, {"color": "#472f7d", "id": "Ulrich Sonnemann", "label": "Ulrich Sonnemann", "shape": "dot", "size": 5}, {"color": "#440154", "id": "K\u00e4te Hamburger", "label": "K\u00e4te Hamburger", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Peter Fuss", "label": "Peter Fuss", "shape": "dot", "size": 5}, {"color": "#414487", "id": "Karl L\u00f6with", "label": "Karl L\u00f6with", "shape": "dot", "size": 5}, {"color": "#414487", "id": "Jonas Cohn", "label": "Jonas Cohn", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Man\u00e8s Sperber", "label": "Man\u00e8s Sperber", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Richard Kroner", "label": "Richard Kroner", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Max Wiener", "label": "Max Wiener", "shape": "dot", "size": 6}, {"color": "#440154", "id": "Leonard H. Ehrlich", "label": "Leonard H. Ehrlich", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Robert Ulich", "label": "Robert Ulich", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Jacob Klein", "label": "Jacob Klein", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Simon Rawidowicz", "label": "Simon Rawidowicz", "shape": "dot", "size": 6}, {"color": "#440154", "id": "Hans Meyerhoff", "label": "Hans Meyerhoff", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Eugen Rosenstock-Huessy", "label": "Eugen Rosenstock-Huessy", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Paul Ludwig Landsberg", "label": "Paul Ludwig Landsberg", "shape": "dot", "size": 5}, {"color": "#39568c", "id": "Carl Gustav Hempel", "label": "Carl Gustav Hempel", "shape": "dot", "size": 11}, {"color": "#481a6c", "id": "Paul Oppenheim", "label": "Paul Oppenheim", "shape": "dot", "size": 5}, {"color": "#472f7d", "id": "Nicholas Rescher", "label": "Nicholas Rescher", "shape": "dot", "size": 6}, {"color": "#481a6c", "id": "Adolf Gr\u00fcnbaum", "label": "Adolf Gr\u00fcnbaum", "shape": "dot", "size": 5}, {"color": "#472f7d", "id": "Kurt Grelling", "label": "Kurt Grelling", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Kurt Baier", "label": "Kurt Baier", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Alexander Herzberg", "label": "Alexander Herzberg", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Helmut Kuhn", "label": "Helmut Kuhn", "shape": "dot", "size": 5}, {"color": "#472f7d", "id": "Gertrud Bing", "label": "Gertrud Bing", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Edgar Wind", "label": "Edgar Wind", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Walter Solmitz", "label": "Walter Solmitz", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Heinrich Walter Cassirer", "label": "Heinrich Walter Cassirer", "shape": "dot", "size": 5}, {"color": "#481a6c", "id": "Siegfried Marck", "label": "Siegfried Marck", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Vil\u00e9m Flusser", "label": "Vil\u00e9m Flusser", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Moritz L\u00f6wi", "label": "Moritz L\u00f6wi", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Dietrich von Hildebrand", "label": "Dietrich von Hildebrand", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Balduin Schwarz", "label": "Balduin Schwarz", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Emil Fackenheim", "label": "Emil Fackenheim", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Grete Hermann", "label": "Grete Hermann", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Gustav Heckmann", "label": "Gustav Heckmann", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Werner Gottfried Brock", "label": "Werner Gottfried Brock", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Georg Misch", "label": "Georg Misch", "shape": "dot", "size": 5}, {"color": "#440154", "id": "Fritz Bamberger", "label": "Fritz Bamberger", "shape": "dot", "size": 5}]);
+                  edges = new vis.DataSet([{"from": "Bernhard Groethuysen", "to": "Martin Buber", "width": 1}, {"from": "Bernhard Groethuysen", "to": "Ernst Bloch", "width": 1}, {"from": "Bernhard Groethuysen", "to": "Margarete Susman", "width": 1}, {"from": "Martin Buber", "to": "Hannah Arendt", "width": 1}, {"from": "Martin Buber", "to": "Ernst Simon", "width": 1}, {"from": "Martin Buber", "to": "Salomo Friedlaender", "width": 1}, {"from": "Martin Buber", "to": "Hans Jonas", "width": 1}, {"from": "Martin Buber", "to": "Leo Strauss", "width": 1}, {"from": "Martin Buber", "to": "Margarete Susman", "width": 1}, {"from": "Martin Buber", "to": "Abraham Joshua Heschel", "width": 1}, {"from": "Martin Buber", "to": "Hermann Levin Goldschmidt", "width": 1}, {"from": "Martin Buber", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Martin Buber", "to": "Rivka Horwitz", "width": 1}, {"from": "Martin Buber", "to": "Ze\u2019ev Levy", "width": 1}, {"from": "Ernst Bloch", "to": "Herbert Marcuse", "width": 1}, {"from": "Ernst Bloch", "to": "Hans Jonas", "width": 1}, {"from": "Ernst Bloch", "to": "Paul Tillich", "width": 1}, {"from": "Ernst Bloch", "to": "Ernst Simon", "width": 1}, {"from": "Ernst Bloch", "to": "Walter Benjamin", "width": 1}, {"from": "Ernst Bloch", "to": "Theodor W. Adorno", "width": 1}, {"from": "Ernst Bloch", "to": "Karl Korsch", "width": 1}, {"from": "Ernst Bloch", "to": "Alfred Sohn-Rethel", "width": 1}, {"from": "Ernst Bloch", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Ernst Bloch", "to": "Gotthard G\u00fcnther", "width": 1}, {"from": "Ernst Bloch", "to": "Margarete Susman", "width": 1}, {"from": "Margarete Susman", "to": "Hermann Levin Goldschmidt", "width": 1}, {"from": "Hans B\u00fcchenbacher", "to": "Karl Korsch", "width": 1}, {"from": "Karl Korsch", "to": "Hans Reichenbach", "width": 1}, {"from": "Karl Korsch", "to": "Walter Benjamin", "width": 1}, {"from": "Karl Korsch", "to": "Oskar Goldberg", "width": 1}, {"from": "Lotte Labowsky", "to": "Raymond Klibansky", "width": 1}, {"from": "Raymond Klibansky", "to": "Ernst Cassirer", "width": 1}, {"from": "Raymond Klibansky", "to": "Ernst Hoffmann", "width": 1}, {"from": "Erich Fromm", "to": "Max Horkheimer", "width": 1}, {"from": "Erich Fromm", "to": "Walter Benjamin", "width": 1}, {"from": "Erich Fromm", "to": "Theodor W. Adorno", "width": 1}, {"from": "Erich Fromm", "to": "Herbert Marcuse", "width": 1}, {"from": "Erich Fromm", "to": "Norbert Elias", "width": 1}, {"from": "Erich Fromm", "to": "Paul Tillich", "width": 1}, {"from": "Max Horkheimer", "to": "Herbert Marcuse", "width": 1}, {"from": "Max Horkheimer", "to": "Walter Benjamin", "width": 1}, {"from": "Max Horkheimer", "to": "Theodor W. Adorno", "width": 1}, {"from": "Max Horkheimer", "to": "Otto Neurath", "width": 1}, {"from": "Max Horkheimer", "to": "Hans Jonas", "width": 1}, {"from": "Max Horkheimer", "to": "Karl Mannheim", "width": 1}, {"from": "Max Horkheimer", "to": "Alfred Sohn-Rethel", "width": 1}, {"from": "Max Horkheimer", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Max Horkheimer", "to": "Zvi H. Rosen", "width": 1}, {"from": "Walter Benjamin", "to": "Hannah Arendt", "width": 1}, {"from": "Walter Benjamin", "to": "Salomo Friedlaender", "width": 1}, {"from": "Walter Benjamin", "to": "Theodor Lessing", "width": 1}, {"from": "Walter Benjamin", "to": "Alfred Sohn-Rethel", "width": 1}, {"from": "Walter Benjamin", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Walter Benjamin", "to": "Heinrich Bl\u00fccher", "width": 1}, {"from": "Walter Benjamin", "to": "Leo Strauss", "width": 1}, {"from": "Walter Benjamin", "to": "Richard H\u00f6nigswald", "width": 1}, {"from": "Walter Benjamin", "to": "William Stern", "width": 1}, {"from": "Walter Benjamin", "to": "Theodor W. Adorno", "width": 1}, {"from": "Walter Benjamin", "to": "Oskar Goldberg", "width": 1}, {"from": "Walter Benjamin", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Theodor W. Adorno", "to": "Hannah Arendt", "width": 1}, {"from": "Theodor W. Adorno", "to": "Herbert Marcuse", "width": 1}, {"from": "Theodor W. Adorno", "to": "Karl Mannheim", "width": 1}, {"from": "Theodor W. Adorno", "to": "Alfred Sohn-Rethel", "width": 1}, {"from": "Theodor W. Adorno", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Theodor W. Adorno", "to": "Walter Dubislav", "width": 1}, {"from": "Theodor W. Adorno", "to": "Ulrich Sonnemann", "width": 1}, {"from": "Theodor W. Adorno", "to": "Paul Tillich", "width": 1}, {"from": "Hannah Arendt", "to": "Hans Jonas", "width": 1}, {"from": "Hannah Arendt", "to": "Karl Mannheim", "width": 1}, {"from": "Hannah Arendt", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Hannah Arendt", "to": "Heinrich Bl\u00fccher", "width": 1}, {"from": "Hannah Arendt", "to": "Paul Tillich", "width": 1}, {"from": "Hannah Arendt", "to": "K\u00e4te Hamburger", "width": 1}, {"from": "Hannah Arendt", "to": "Leo Strauss", "width": 1}, {"from": "Hannah Arendt", "to": "William Stern", "width": 1}, {"from": "Hannah Arendt", "to": "Ernst Simon", "width": 1}, {"from": "Hannah Arendt", "to": "Peter Fuss", "width": 1}, {"from": "Hans Jonas", "to": "Karl L\u00f6with", "width": 1}, {"from": "Hans Jonas", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Hans Jonas", "to": "Leo Strauss", "width": 1}, {"from": "Hans Jonas", "to": "Jonas Cohn", "width": 1}, {"from": "Hans Jonas", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Karl Mannheim", "to": "Herbert Marcuse", "width": 1}, {"from": "Karl Mannheim", "to": "Norbert Elias", "width": 1}, {"from": "Karl Mannheim", "to": "Paul Tillich", "width": 1}, {"from": "Karl Mannheim", "to": "G\u00fcnther Anders", "width": 1}, {"from": "Karl Mannheim", "to": "Leo Strauss", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Herbert Marcuse", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Karl L\u00f6with", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Ernst Cassirer", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Heinrich Bl\u00fccher", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Man\u00e8s Sperber", "width": 1}, {"from": "G\u00fcnther Anders", "to": "Paul Tillich", "width": 1}, {"from": "G\u00fcnther Anders", "to": "William Stern", "width": 1}, {"from": "Paul Tillich", "to": "Karl L\u00f6with", "width": 1}, {"from": "Paul Tillich", "to": "Ernst Cassirer", "width": 1}, {"from": "Paul Tillich", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Paul Tillich", "to": "Leo Strauss", "width": 1}, {"from": "Paul Tillich", "to": "Richard Kroner", "width": 1}, {"from": "Paul Tillich", "to": "Max Wiener", "width": 1}, {"from": "Paul Tillich", "to": "Leonard H. Ehrlich", "width": 1}, {"from": "Paul Tillich", "to": "Robert Ulich", "width": 1}, {"from": "Leo Strauss", "to": "Karl L\u00f6with", "width": 1}, {"from": "Leo Strauss", "to": "Norbert Elias", "width": 1}, {"from": "Leo Strauss", "to": "Ernst Cassirer", "width": 1}, {"from": "Leo Strauss", "to": "Jacob Klein", "width": 1}, {"from": "Leo Strauss", "to": "Ernst Simon", "width": 1}, {"from": "Leo Strauss", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Leo Strauss", "to": "Simon Rawidowicz", "width": 1}, {"from": "Herbert Marcuse", "to": "Zvi H. Rosen", "width": 1}, {"from": "Herbert Marcuse", "to": "Hans Meyerhoff", "width": 1}, {"from": "Ernst Simon", "to": "Eugen Rosenstock-Huessy", "width": 1}, {"from": "Theodor Lessing", "to": "Paul Ludwig Landsberg", "width": 1}, {"from": "Carl Gustav Hempel", "to": "Paul Oppenheim", "width": 1}, {"from": "Carl Gustav Hempel", "to": "Nicholas Rescher", "width": 1}, {"from": "Carl Gustav Hempel", "to": "Hans Reichenbach", "width": 1}, {"from": "Carl Gustav Hempel", "to": "Adolf Gr\u00fcnbaum", "width": 1}, {"from": "Carl Gustav Hempel", "to": "Kurt Grelling", "width": 1}, {"from": "Paul Oppenheim", "to": "Kurt Grelling", "width": 1}, {"from": "Nicholas Rescher", "to": "Adolf Gr\u00fcnbaum", "width": 1}, {"from": "Nicholas Rescher", "to": "Kurt Baier", "width": 1}, {"from": "Hans Reichenbach", "to": "Kurt Grelling", "width": 1}, {"from": "Hans Reichenbach", "to": "Ernst Cassirer", "width": 1}, {"from": "Hans Reichenbach", "to": "Alexander Herzberg", "width": 1}, {"from": "Ernst Cassirer", "to": "Helmut Kuhn", "width": 1}, {"from": "Ernst Cassirer", "to": "Alfred Sohn-Rethel", "width": 1}, {"from": "Ernst Cassirer", "to": "William Stern", "width": 1}, {"from": "Ernst Cassirer", "to": "Gertrud Bing", "width": 1}, {"from": "Ernst Cassirer", "to": "Edgar Wind", "width": 1}, {"from": "Ernst Cassirer", "to": "Richard H\u00f6nigswald", "width": 1}, {"from": "Ernst Cassirer", "to": "Jonas Cohn", "width": 1}, {"from": "Ernst Cassirer", "to": "Eveline Goodman-Thau", "width": 1}, {"from": "Ernst Cassirer", "to": "Walter Solmitz", "width": 1}, {"from": "Ernst Cassirer", "to": "Heinrich Walter Cassirer", "width": 1}, {"from": "Helmut Kuhn", "to": "Gertrud Bing", "width": 1}, {"from": "Jonas Cohn", "to": "William Stern", "width": 1}, {"from": "Jonas Cohn", "to": "Siegfried Marck", "width": 1}, {"from": "Norbert Elias", "to": "Gotthard G\u00fcnther", "width": 1}, {"from": "Norbert Elias", "to": "Richard H\u00f6nigswald", "width": 1}, {"from": "Gotthard G\u00fcnther", "to": "Vil\u00e9m Flusser", "width": 1}, {"from": "Richard H\u00f6nigswald", "to": "William Stern", "width": 1}, {"from": "Richard H\u00f6nigswald", "to": "Moritz L\u00f6wi", "width": 1}, {"from": "Richard H\u00f6nigswald", "to": "Siegfried Marck", "width": 1}, {"from": "Eveline Goodman-Thau", "to": "Ulrich Sonnemann", "width": 1}, {"from": "Eveline Goodman-Thau", "to": "Rivka Horwitz", "width": 1}, {"from": "Gertrud Bing", "to": "Walter Solmitz", "width": 1}, {"from": "Dietrich von Hildebrand", "to": "Balduin Schwarz", "width": 1}, {"from": "Ulrich Sonnemann", "to": "Peter Fuss", "width": 1}, {"from": "Emil Fackenheim", "to": "Max Wiener", "width": 1}, {"from": "Grete Hermann", "to": "Gustav Heckmann", "width": 1}, {"from": "Werner Gottfried Brock", "to": "Georg Misch", "width": 1}, {"from": "Simon Rawidowicz", "to": "Fritz Bamberger", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

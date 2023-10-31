@@ -1,11 +1,12 @@
 import re
 import random
+from datetime import date
 import pandas as pd
 import streamlit as st
 import numpy as np
 import streamlit.components.v1 as components
 import networkx as nx
-import community
+import community.community_louvain as cl 
 from streamlit_folium import folium_static
 import folium
 import matplotlib.cm as cm
@@ -24,8 +25,8 @@ st.set_page_config(page_title="Exiled Philosophers",
 def get_data():
     df = pd.read_excel("data/philos_manual-adj.xlsx")
     edges = pd.read_excel("data/philos_adj.xlsx")
-    #df["birthDate"] = pd.to_datetime(df["birthDate"], format="%Y")
-    #df["deathDate"] = pd.to_datetime(df["deathDate"], format="%Y")
+    df["birthDate"] = pd.to_datetime(df["birthDate"])
+    df["deathDate"] = pd.to_datetime(df["deathDate"])
     return df, edges
 
 df, edges = get_data()
@@ -39,15 +40,30 @@ df["name"] = df["id"].apply(sanitize_name)
 edges = edges.applymap(sanitize_name)
 
 # ----- SIDEBAR ------
+# Network related inputs
 st.sidebar.header("Network")
 
 net_coloring = st.sidebar.radio("Coloring", 
-                                ["Grade", "Community"])
+                                ["Grade Centrality", "Community"])
 
+# Map and dataframe related inputs
 st.sidebar.header("Map and Raw Data")
+
+include_orphans = st.sidebar.checkbox("Include philosophers without connections", value=True)
 
 map_coloring = st.sidebar.radio("Coloring",
                                 ["Born / Died", "Community", "Individual"])
+
+born_min, born_max = st.sidebar.slider("Born between",
+                                        value=(date(1862, 1, 1), date(1934, 12, 31)))
+
+death_min, death_max = st.sidebar.slider("Died between",
+                                          value=(date(1933, 1, 1), date(2023, 12, 31)))
+
+
+df = df.query(
+    "birthDate >= @born_min & birthDate <= @born_max & ((deathDate >= @death_min & deathDate <= @death_max) | missingDeathDate)"
+)
 
 # ----- MAINPAGE -----
 st.title(":classical_building: Exiled Philosophers")
@@ -62,7 +78,7 @@ edges_wo = edges[edges['source'] != edges['target']]
 orphaned_philos = set(edges["source"].unique()) - set(edges_wo["source"].unique())
 
 G = nx.from_pandas_edgelist(edges_wo)
-partition = community.best_partition(G)
+partition = cl.best_partition(G)
 
 # Calculate betweenness centrality
 betweenness_dict = nx.betweenness_centrality(G)
@@ -136,6 +152,9 @@ tab1, tab2, tab3 = st.tabs(["Network", "Spatial", "Raw Data"])
 
 
 with tab1:
+    tab1.markdown("""
+    Zoom in, interact with nodes and explore the network of exiled philosophers!
+    """)
     net = Network()
     net.from_nx(G)
     net.save_graph("tmp.html")
@@ -152,6 +171,9 @@ with tab2:
     without_death_place = []
 
     for _, row in df.iterrows():
+        if not include_orphans and (row["name"] in orphaned_philos):
+            continue
+
         folium.Marker(
                     coord_jitter(row["birthGis"]),
                     popup=create_born_tooltip(row),
