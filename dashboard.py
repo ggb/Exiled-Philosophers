@@ -44,7 +44,7 @@ edges = edges.applymap(sanitize_name)
 st.sidebar.header("Network")
 
 net_coloring = st.sidebar.radio("Coloring", 
-                                ["Degree Centrality", "Community"])
+                                ["Degree Centrality", "Community", "Gender"])
 
 node_size_alg = st.sidebar.radio("Node size",
                                  ["Uniform", "Degree", "SP Betweenness", "Harmonic"],
@@ -56,7 +56,7 @@ st.sidebar.header("Map and Raw Data")
 include_orphans = st.sidebar.checkbox("Include philosophers without connections", value=True)
 
 map_coloring = st.sidebar.radio("Coloring",
-                                ["Born / Died", "Community", "Individual"])
+                                ["Born / Died", "Community", "Individual", "Gender"])
 
 born_min, born_max = st.sidebar.slider("Born between",
                                         value=(date(1862, 1, 1), date(1934, 12, 31)))
@@ -152,12 +152,24 @@ def color_marker(row, birth=True):
         return "blue" if birth else "black"
     elif map_coloring == "Community":
         return partition_map_color(row["name"])
+    elif map_coloring == "Gender":
+        return "orange" if row["gender"] == "f" else "gray"
     else: 
         return random.choice(folium_colors)
 
+def determine_node_color(node):
+    if net_coloring == "Community":
+        return partition_map_color(node)
+    elif net_coloring == "Gender":
+        p = df[df["name"] == node]
+        return "orange" if p["gender"].iloc[0] == "f" else "gray"
+    else:
+        return degree_color(node)
+
+
 for i, node in enumerate(G.nodes()):
     G.nodes[node]['size'] = node_size_calc(node)
-    G.nodes[node]['color'] = partition_map_color(node) if net_coloring == "Community" else degree_color(node)
+    G.nodes[node]['color'] = determine_node_color(node)
 
 
 # ----- MAINPAGE -----
@@ -170,8 +182,11 @@ col3.metric("Birth places", len(df["birthPlace"].unique()))
 col4.metric("Death places", len(df["deathPlace"].unique()))
 
 st.markdown("""
-##
-           
+With the onset of National Socialist rule in Germany in 1933, many German intellectuals, including philosophers, faced increasing exclusion and persecution. While the Law for the Restoration of the Professional Civil Service made academic careers impossible for people of Jewish faith and dissenting political views, hostility also increased, culminating first in the November pogroms, then in the mass murder of the concentration camps. 
+            
+Those who had the opportunity sooner or later took leave of the German Reich and fled, sometimes under dramatic circumstances. These experiences, the collapse of the democratic Weimar Republic and the seizure of power by a dictator, war, flight and the Shoah, as well as the experience of one's own foreignness in another country with a new language, shaped those who fled and even changed their thinking, but also ensured a strong sense of belonging among themselves. This is true for some of the most influential philosophers of the 20th century, as can be seen in individual biographies and self-testimonies. 
+            
+This dashboard allows to explore the network of exiled philosophers, as well as to trace the geographical distribution based on places of birth and death. An overview of how the data was obtained and its limitations can be found below the visualizations. 
 """)
 
 #
@@ -179,7 +194,7 @@ tab1, tab2, tab3 = st.tabs(["Network", "Spatial", "Raw Data"])
 
 with tab1:
     tab1.markdown(f"""
-    Zoom in, interact with nodes and explore the network of exiled philosophers! { max(partition.values()) + 1 } communities of philosophers were identified in the network, using the [louvain communities](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html) algorithm.
+    Zoom in, interact with nodes and explore the network of exiled philosophers! 
     """)
     net = Network()
     net.from_nx(G)
@@ -189,6 +204,8 @@ with tab1:
     components.html(html_file.read(), height=620)
 
     tab1.markdown(f"""
+    { max(partition.values()) + 1 } communities of philosophers were identified in the network, using the [louvain communities](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html) algorithm.
+                  
     The following philosophers had no connections to other philosophers and were removed from the network visualization: { ", ".join(orphaned_philos) }. 
     """)
 
