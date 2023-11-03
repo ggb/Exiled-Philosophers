@@ -162,7 +162,10 @@ def determine_node_color(node):
         return partition_map_color(node)
     elif net_coloring == "Gender":
         p = df[df["name"] == node]
-        return "orange" if p["gender"].iloc[0] == "f" else "gray"
+        try:
+            return "orange" if p["gender"].iloc[0] == "f" else "gray"
+        except:
+            return "gray"
     else:
         return degree_color(node)
 
