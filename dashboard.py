@@ -242,3 +242,22 @@ with tab2:
 with tab3:
     tab3.dataframe(df)
     #tab3.dataframe(edges_wo)
+
+st.markdown("""
+## Where does the data come from?
+
+The data visualized here was created automatically from information stored in DBpedia and Wikipedia. For this purpose, two SPARQL queries were used to filter the (German) DBpedia for entries belonging to the following two categories:
+            
+* Emigrant aus dem Deutschen Reich zur Zeit des Nationalsozialismus (Emigrants from Nazi Germany) 
+* Philosoph (20. Jahrhundert) (20th-century philosophers)    
+
+After an initial data set was generated in this way, two further processing steps followed: (1.) First, the Wikipedia page was called up for each of the philosophers and the text was checked for mentions of all other philosophers. This resulted in an adjacency list, which is used for the network visualization. (2.) The data was manually cleaned and standardized. In particular, missing dates and places of death were added, as well as the gender of the philosophers. 
+
+## What are the limitations?
+
+The dataset was automatically generated from the DB- and Wikipedia, accordingly, only data is available that exists there. Wikipedia is known to have a gender bias that makes women invisible (D'Ignazio & Klein, 2020, p. 180). As a simple coloring of the data by gender shows, women are also/therefore significantly underrepresented in the present data set. 
+            
+Furthermore, the decision about who is included in the dataset is currently made on the basis of Wikipedia categories, which are determined by humans on the basis of sometimes unclear principles or with biases: Gretel Adorno, for example, is categorized neither as a philos-opher nor as an exile and is not present in my dataset, although there is no doubt that she was instrumental in the creation of the “Dialectic of Enlightenment” (Von Boeckmann, 2004). The Latvian-born Judith N. Shklar, on the other hand, who fled as a teenager (Bajohr, 2014), is categorized as an exile, but not as a philosopher, and is therefore “not visible”; she is sorted as a political scientist, a categorization that, especially in the 20th century, is often not free of overlap with philosophy. 
+            
+One positive outcome of the project is that such gaps become visible: The workflow presented is easily adaptable to include political scientists, and Wikipedia, as an open platform, is open to changes by users (I have added the missing categories for Gretel Adorno and Judith N. Shklar to the German Wikipedia.).
+""")
