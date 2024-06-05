@@ -10,5 +10,5 @@ streamlit
 streamlit-folium
 python-louvain 
 networkx
-matplotlib
+matplotlib==3.7.3
 pyvis
