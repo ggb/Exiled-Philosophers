@@ -9,13 +9,13 @@ from ast import literal_eval
 wikipedia.set_lang("de")
 
 # German SPARQL DBpedia endpoint
-sparql = SPARQLWrapper("http://de.dbpedia.org/sparql")
+sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
 def query_philosophers():
     sparql.setQuery("""
     PREFIX dcterms: <http://purl.org/dc/terms/>
-    PREFIX dbc1: <http://de.dbpedia.org/resource/Kategorie:Emigrant_aus_dem_Deutschen_Reich_zur_Zeit_des_Nationalsozialismus>
-    PREFIX dbc2: <http://de.dbpedia.org/resource/Kategorie:Philosoph_(20._Jahrhundert)>
+    PREFIX dbc1: <http://dbpedia.org/resource/Kategorie:Emigrant_aus_dem_Deutschen_Reich_zur_Zeit_des_Nationalsozialismus>
+    PREFIX dbc2: <http://dbpedia.org/resource/Kategorie:Philosoph_(20._Jahrhundert)>
 
     SELECT DISTINCT ?person
     WHERE {
@@ -31,7 +31,7 @@ def query_philosopher_data(unique_name):
     sparql.setQuery(f"""
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
     PREFIX dbo: <http://dbpedia.org/ontology/>
-    PREFIX dbr: <http://de.dbpedia.org/resource/>
+    PREFIX dbr: <http://dbpedia.org/resource/>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
     SELECT ?name ?birthDate ?deathDate ?birthPlace ?birthGis ?deathPlace ?deathGis
@@ -75,11 +75,11 @@ def query_philosopher_data(unique_name):
 
 
 # As a friendly API consumer I try to reduce API calls: therefore we store intermediate results
-# philos = pd.DataFrame([query_philosopher_data(p) for p in query_philosophers()])
-# philos.to_excel("data/philos_raw.xlsx", index=False)
+philos = pd.DataFrame([query_philosopher_data(p) for p in query_philosophers()])
+philos.to_excel("data/philos_raw_new.xlsx", index=False)
 
-philos = pd.read_excel("data/philos_raw.xlsx")
-philos["name"] = philos["name"].apply(literal_eval)
+#philos = pd.read_excel("data/philos_raw.xlsx")
+#philos["name"] = philos["name"].apply(literal_eval)
 
 def check_connection(text, string_set):
     return any(word in text for word in string_set)
@@ -107,7 +107,7 @@ def philos_adjacency():
 #adjacencies.to_excel("data/philos_adj.xlsx", index=False)
 
 # run: python -m spacy download de_core_news_sm
-nlp = spacy.load('de_core_news_sm')
+#nlp = spacy.load('de_core_news_sm')
 def perform_ner(philo_id="http://de.dbpedia.org/resource/Hannah_Arendt"):
     page = wikipedia.page(philo_id.replace("http://de.dbpedia.org/resource/", ""), auto_suggest=False)
     doc = nlp(page.content)
